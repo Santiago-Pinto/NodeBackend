@@ -19,6 +19,8 @@ export const getAlbums = (from?: number, to?: number): Album[] => {
     result = albums.filter((album) => {
       return album.year >= from && album.year <= to;
     });
+  } else {
+      result = albums;
   }
   return result;
 };
