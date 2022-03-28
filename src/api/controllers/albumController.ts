@@ -1,17 +1,38 @@
 import { Request, Response } from "express";
+import {
+  getAlbums as getAlbumsByYearRange,
+  getAlbumById as getAlbumFromId,
+} from "../services/albumService";
 
-export const getAllAlbums = (request: Request, response: Response) => {
-  response.statusCode = 200;
-  return response.json([
-    { id: 1, name: "When Day and Dream Unite", year: 1989 },
-    { id: 2, name: "Images and Words", year: 1992 },
-    { id: 3, name: "Awake", year: 1994 },
-    { id: 4, name: "Falling into Infinity", year: 1997 },
-    { id: 5, name: "Metropolis Pt 2: Scenes From a Memory", year: 1999 },
-    { id: 6, name: "Six Degrees of Inner Turbulence", year: 2002 },
-    { id: 7, name: "Train of Thought", year: 2003 },
-    { id: 8, name: "Octavarium", year: 2005 },
-    { id: 9, name: "Systematic Chaos", year: 2007 },
-    { id: 10, name: "Black Clouds & Silver Linings", year: 2009 },
-  ]);
+// If query params are provided, the following fuction will filter albums, otherwise it will return all
+export const getAlbums = (request: Request, response: Response) => {
+  let result;
+  const from = parseInt(request.query.from as string);
+  const to = request.query.to ? parseInt(request.query.to as string) : from;
+  result = getAlbumsByYearRange(from, to);
+
+  if (result.length > 0) {
+    response.statusCode = 200;
+    return response.json(result);
+  }
+
+  response.statusCode = 404;
+  return response.json({
+    error: "No albums were found for the years provided",
+  });
+};
+
+// This is an example with header params
+export const getAlbumById = (request: Request, response: Response) => {
+  const result = getAlbumFromId(parseInt(request.params.id));
+
+  if (result) {
+    response.statusCode = 200;
+    return response.json(result);
+  }
+
+  response.statusCode = 404;
+  return response.json({
+    error: "No album with the provided id exists",
+  });
 };
