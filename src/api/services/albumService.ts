@@ -1,14 +1,17 @@
-import {
-  getAlbums as getAlbumsFromYearRange,
-  getAlbumsFromId,
-} from "../repositories/albumRepository";
+import { AlbumRepository } from "../repositories/albumRepository";
 import { Album } from "../models/album";
 
-export const getAlbums = (from?: number, to?: number): Album[] => {
-  return getAlbumsFromYearRange(from, to);
-};
+export class AlbumService {
+  albumRepository: AlbumRepository;
+  constructor() {
+    this.albumRepository = new AlbumRepository();
+  }
 
-//This function should not return undefined, but since we don't have exception yet, we just handle it this way
-export const getAlbumById = (id: number): Album | undefined => {
-  return getAlbumsFromId(id);
-};
+  getAlbums = (from?: number, to?: number): Album[] => {
+    return this.albumRepository.getAlbums(from, to);
+  };
+
+  getAlbumById = (id: number): Album | undefined => {
+    return this.albumRepository.getAlbumsById(id);
+  };
+}

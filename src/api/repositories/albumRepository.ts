@@ -12,19 +12,21 @@ const albums = [
   { id: 10, name: "Black Clouds & Silver Linings", year: 2009 },
 ];
 
-//Here will go the queries to the data base in the future
-export const getAlbums = (from?: number, to?: number): Album[] => {
-  let result: Album[] = [];
-  if (from && to) {
-    result = albums.filter((album) => {
-      return album.year >= from && album.year <= to;
-    });
-  } else {
-    result = albums;
-  }
-  return result;
-};
+export class AlbumRepository {
+  //Here will go the queries to the data base in the future
+  getAlbums = (from?: number, to?: number): Album[] => {
+    let result: Album[] = [];
+    if (from && to) {
+      result = albums.filter((album) => {
+        return album.year >= from && album.year <= to;
+      });
+    } else {
+      result = albums;
+    }
+    return result;
+  };
 
-export const getAlbumsFromId = (id: number): Album | undefined => {
-  return albums.find((album) => album.id === id);
-};
+  getAlbumsById = (id: number): Album | undefined => {
+    return albums.find((album) => album.id === id);
+  };
+}
