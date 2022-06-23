@@ -1,10 +1,11 @@
 import express from "express";
-import { getAlbums, getAlbumById } from "../controllers/albumController";
+import { AlbumController } from "../controllers/albumController";
 
 const router = express.Router();
+const albumController = new AlbumController();
 
 // Here go the routes that the AlbumRouter will handle
-router.get("/", getAlbums);
-router.get("/:id", getAlbumById);
+router.get("/", albumController.getAlbums);
+router.get("/:id", albumController.getAlbumById);
 
 export { router as AlbumRouter };
