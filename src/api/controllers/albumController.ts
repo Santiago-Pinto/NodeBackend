@@ -6,10 +6,9 @@ import {
 
 // If query params are provided, the following fuction will filter albums, otherwise it will return all
 export const getAlbums = (request: Request, response: Response) => {
-  let result;
   const from = parseInt(request.query.from as string);
   const to = request.query.to ? parseInt(request.query.to as string) : from;
-  result = getAlbumsByYearRange(from, to);
+  const result = getAlbumsByYearRange(from, to);
 
   if (result.length > 0) {
     response.statusCode = 200;

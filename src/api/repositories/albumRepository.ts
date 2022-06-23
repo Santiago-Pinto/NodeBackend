@@ -20,7 +20,7 @@ export const getAlbums = (from?: number, to?: number): Album[] => {
       return album.year >= from && album.year <= to;
     });
   } else {
-      result = albums;
+    result = albums;
   }
   return result;
 };
