@@ -1,5 +1,6 @@
 import { AlbumRepository } from "../repositories/albumRepository";
 import { Album } from "../models/album";
+import { AlbumFilter } from "../models/filters/albumFilter";
 
 export class AlbumService {
   albumRepository: AlbumRepository;
@@ -7,8 +8,8 @@ export class AlbumService {
     this.albumRepository = new AlbumRepository();
   }
 
-  getAlbums = (from?: number, to?: number): Album[] => {
-    return this.albumRepository.getAlbums(from, to);
+  getAlbums = (filter: AlbumFilter): Album[] => {
+    return this.albumRepository.getAlbums(filter);
   };
 
   getAlbumById = (id: number): Album | undefined => {

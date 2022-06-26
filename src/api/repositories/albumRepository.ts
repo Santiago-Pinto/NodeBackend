@@ -1,4 +1,5 @@
 import { Album } from "../models/album";
+import { AlbumFilter } from "../models/filters/albumFilter";
 const albums = [
   { id: 1, name: "When Day and Dream Unite", year: 1989 },
   { id: 2, name: "Images and Words", year: 1992 },
@@ -14,8 +15,11 @@ const albums = [
 
 export class AlbumRepository {
   //Here will go the queries to the data base in the future
-  getAlbums = (from?: number, to?: number): Album[] => {
+  getAlbums = (filter: AlbumFilter): Album[] => {
     let result: Album[] = [];
+    const from = filter.getFilter().from;
+    const to = filter.getFilter().to;
+
     if (from && to) {
       result = albums.filter((album) => {
         return album.year >= from && album.year <= to;
