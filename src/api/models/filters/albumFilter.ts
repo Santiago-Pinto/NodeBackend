@@ -23,7 +23,6 @@ export class AlbumFilter {
   }
 
   getFilter = () => {
-    console.log(this.filter);
     return this.filter;
   };
 }
