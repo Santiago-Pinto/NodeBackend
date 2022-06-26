@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AlbumService } from "../services/albumService";
 import { statusCodes } from "../utils/statusCodes";
+import { AlbumFilter } from "../models/filters/albumFilter";
 
 export class AlbumController {
   albumService: AlbumService;
@@ -11,9 +12,13 @@ export class AlbumController {
 
   // If query params are provided, the following fuction will filter albums, otherwise it will return all
   getAlbums = (request: Request, response: Response) => {
+    const band = request.query.band as string;
     const from = parseInt(request.query.from as string);
-    const to = request.query.to ? parseInt(request.query.to as string) : from;
-    const result = this.albumService.getAlbums(from, to);
+    const to = parseInt(request.query.to as string);
+    const albumFilter = new AlbumFilter(band, from, to);
+
+    const result = this.albumService.getAlbums(albumFilter);
+
 
     if (result.length > 0) {
       response.statusCode = statusCodes.SUCCESS;
