@@ -10,7 +10,7 @@ export class AlbumFilter {
   constructor(band?: string, from?: number, to?: number) {
     this.filter = {};
     if (band) {
-      this.filter.band = replaceDoubleQuotesWithSingle(band);
+      this.filter.band = replaceDoubleQuotesWithSingle(band); //Single quotes required because of the SGBD used
     }
 
     if (from) {
