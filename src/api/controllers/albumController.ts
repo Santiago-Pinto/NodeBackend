@@ -19,7 +19,6 @@ export class AlbumController {
 
     const albums = await this.albumService.getAlbums(albumFilter);
 
-
     if (albums.length > 0) {
       response.statusCode = statusCodes.SUCCESS;
       return response.json(albums);
@@ -27,12 +26,14 @@ export class AlbumController {
 
     response.statusCode = statusCodes.NOT_FOUND;
     return response.json({
-      error: "No albums were found for the years provided",
+      error: "No albums were found for the parameters provided",
     });
   };
 
-  getAlbumById = (request: Request, response: Response) => {
-    const result = this.albumService.getAlbumById(parseInt(request.params.id));
+  getAlbumById = async (request: Request, response: Response) => {
+    const result = await this.albumService.getAlbumById(
+      parseInt(request.params.id)
+    );
 
     if (result) {
       response.statusCode = statusCodes.SUCCESS;

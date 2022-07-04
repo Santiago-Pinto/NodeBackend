@@ -12,7 +12,7 @@ export class AlbumService {
     return await this.albumRepository.getAlbums(filter);
   };
 
-  getAlbumById = (id: number): Album | undefined => {
+  getAlbumById = async (id: number): Promise<Album | null> => {
     return this.albumRepository.getAlbumsById(id);
   };
 }

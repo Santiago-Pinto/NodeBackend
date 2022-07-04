@@ -17,8 +17,10 @@ const connectDB = async () => {
   const sequelize = new Sequelize(config.DB_URI);
   try {
     await sequelize.authenticate();
+    // eslint-disable-next-line no-console
     console.log("Connection has been established successfully.");
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Unable to connect to the database:", error);
   }
 };
@@ -26,6 +28,7 @@ const connectDB = async () => {
 
 app.listen(PORT, async () => {
   await connectDB();
+  // eslint-disable-next-line no-console
   console.log(`Server listening on port: ${PORT}`);
 });
 
