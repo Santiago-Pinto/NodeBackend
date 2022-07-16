@@ -11,28 +11,29 @@ export class AlbumController {
   }
 
   // If query params are provided, the following fuction will filter albums, otherwise it will return all
-  getAlbums = (request: Request, response: Response) => {
+  getAlbums = async (request: Request, response: Response) => {
     const band = request.query.band as string;
     const from = parseInt(request.query.from as string);
     const to = parseInt(request.query.to as string);
     const albumFilter = new AlbumFilter(band, from, to);
 
-    const result = this.albumService.getAlbums(albumFilter);
+    const albums = await this.albumService.getAlbums(albumFilter);
 
-
-    if (result.length > 0) {
+    if (albums.length > 0) {
       response.statusCode = statusCodes.SUCCESS;
-      return response.json(result);
+      return response.json(albums);
     }
 
     response.statusCode = statusCodes.NOT_FOUND;
     return response.json({
-      error: "No albums were found for the years provided",
+      error: "No albums were found for the parameters provided",
     });
   };
 
-  getAlbumById = (request: Request, response: Response) => {
-    const result = this.albumService.getAlbumById(parseInt(request.params.id));
+  getAlbumById = async (request: Request, response: Response) => {
+    const result = await this.albumService.getAlbumById(
+      parseInt(request.params.id)
+    );
 
     if (result) {
       response.statusCode = statusCodes.SUCCESS;

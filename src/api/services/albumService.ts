@@ -8,11 +8,11 @@ export class AlbumService {
     this.albumRepository = new AlbumRepository();
   }
 
-  getAlbums = (filter: AlbumFilter): Album[] => {
-    return this.albumRepository.getAlbums(filter);
+  getAlbums = async (filter: AlbumFilter): Promise<Album[]> => {
+    return await this.albumRepository.getAlbums(filter);
   };
 
-  getAlbumById = (id: number): Album | undefined => {
+  getAlbumById = async (id: number): Promise<Album | null> => {
     return this.albumRepository.getAlbumsById(id);
   };
 }

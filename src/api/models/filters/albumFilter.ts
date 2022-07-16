@@ -1,5 +1,3 @@
-import { replaceDoubleQuotesWithSingle } from "../../utils/stringParse";
-
 export class AlbumFilter {
   filter: {
     band?: string;
@@ -10,7 +8,7 @@ export class AlbumFilter {
   constructor(band?: string, from?: number, to?: number) {
     this.filter = {};
     if (band) {
-      this.filter.band = replaceDoubleQuotesWithSingle(band);
+      this.filter.band = band;
     }
 
     if (from) {
