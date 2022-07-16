@@ -6,7 +6,6 @@ import { config } from "./api/config/config";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
-console.log(config);
 // Here go the routers
 app.use(TestRouter);
 app.use("/album", AlbumRouter); //This one already handles all calls with the /album prefix
