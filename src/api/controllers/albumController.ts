@@ -19,7 +19,7 @@ export class AlbumController {
     if (from > to) {
       response.statusCode = statusCodes.BAD_REQUEST;
       return response.json({
-        error: "'from' value should be lower than 'to'"
+        error: "'from' value should be lower than 'to'",
       });
     }
 

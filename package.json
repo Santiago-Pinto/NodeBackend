@@ -24,7 +24,7 @@
     "dev": "export NODE_ENV=development && nodemon ./src/index.ts",
     "production": "export NODE_ENV=production && nodemon ./src/index.ts",
     "build": "tsc -p .",
-    "lint": "eslint . --ext .ts"
+    "lint": "npx prettier --write . && eslint . --ext .ts"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
