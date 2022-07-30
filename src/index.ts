@@ -25,10 +25,12 @@ const connectDB = async () => {
 };
 //
 
-app.listen(PORT, async () => {
-  await connectDB();
-  // eslint-disable-next-line no-console
-  console.log(`Server listening on port: ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, async () => {
+    await connectDB();
+    // eslint-disable-next-line no-console
+    console.log(`Server listening on port: ${PORT}`);
+  });
+}
 
 export default app; //Need to export the app for test purposes
