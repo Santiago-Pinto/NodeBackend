@@ -21,7 +21,7 @@ export class AlbumRepository {
         queryFilter.year = { [Op.gte]: from };
         break;
 
-      case !from && to:
+      case !from && !!to:
         queryFilter.year = { [Op.lte]: to };
         break;
 

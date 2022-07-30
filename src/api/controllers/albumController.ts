@@ -15,6 +15,14 @@ export class AlbumController {
     const band = request.query.band as string;
     const from = parseInt(request.query.from as string);
     const to = parseInt(request.query.to as string);
+
+    if (from > to) {
+      response.statusCode = statusCodes.BAD_REQUEST;
+      return response.json({
+        error: "'from' value should be lower than 'to'"
+      });
+    }
+
     const albumFilter = new AlbumFilter(band, from, to);
 
     const albums = await this.albumService.getAlbums(albumFilter);
