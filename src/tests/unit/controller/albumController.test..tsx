@@ -148,7 +148,6 @@ describe("Album Controller Tests", () => {
     });
 
     test("Should return status code of 200 if an album is found", async () => {
-      //Since highestAlbumId grants no other album was created after, i just simply increase it by one to force a nonexisting id
       const response = await supertest(app).get(`/album/${highestAlbumId}`);
       expect(response.statusCode).toEqual(200);
       expect(response.body.name).toEqual(testAlbums[2].name);
