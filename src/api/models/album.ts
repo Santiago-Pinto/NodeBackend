@@ -37,10 +37,3 @@ Album.init(
     timestamps: false,
   }
 );
-
-/*export type Album = {
-  id: number;
-  name: string;
-  year: number;
-  band: string;
-};*/

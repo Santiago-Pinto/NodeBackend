@@ -29,6 +29,7 @@ describe("Album Controller Tests", () => {
   beforeEach(async () => {
     await connectDB();
     // To Do: Find a way to use forEach instead of this. I tried, but some async issues are occuring.
+
     await Album.create(testAlbums[0]);
     await Album.create(testAlbums[1]);
     const response = await Album.create(testAlbums[2]);
