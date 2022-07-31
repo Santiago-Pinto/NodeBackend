@@ -23,7 +23,7 @@ export class AlbumService {
     });
 
     if (album) {
-      throw new Error("An album with that name already exists");
+      throw "An album with that name already exists";
     }
 
     return await Album.create(request.body);

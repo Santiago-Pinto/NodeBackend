@@ -77,7 +77,10 @@ export class AlbumController {
 
 const validateAlbumData = (request: Request) => {
   const albumData = request.body;
-  if (!request.body || !albumData.name) {
+  if (!Object.keys(albumData).length) {
+    return "Invalid request, missing request body";
+  }
+  if (!albumData.name) {
     return "An album must have a name";
   }
 

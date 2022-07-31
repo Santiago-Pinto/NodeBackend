@@ -156,4 +156,75 @@ describe("Album Controller Tests", () => {
       expect(response.body.band).toEqual(testAlbums[2].band);
     });
   });
+
+  describe("POST album/", () => {
+    test("Should return error if the request has no body", async () => {
+      const response = await supertest(app).post(`/album`);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toBe("Invalid request, missing request body");
+    });
+    test("Should return error if the album has no name", async () => {
+      const albumWithNoName = {
+        year: 1987,
+        band: "Test Band",
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithNoName);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("An album must have a name");
+    });
+
+    test("Should return error if the album has no release year", async () => {
+      const albumWithNoYear = {
+        name: "New Album",
+        band: "Test Band",
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithNoYear);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("An album must have a release year");
+    });
+
+    test("Should return error if the album has no band", async () => {
+      const albumWithNoBand = {
+        name: "New Album",
+        year: 1987,
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithNoBand);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual(
+        "An album must have a band associated"
+      );
+    });
+
+    test("Should return error if an album with the same name already exists", async () => {
+      const albumWithDuplicatedName = {
+        name: "Test Album",
+        year: 1987,
+        band: "New Band",
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithDuplicatedName);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual(
+        "An album with that name already exists"
+      );
+    });
+
+    test("Should return status code of 201 if an album is created", async () => {
+      const newAlbum = {
+        name: "New Album",
+        year: 1987,
+        band: "New Band",
+      };
+      const response = await supertest(app).post(`/album`).send(newAlbum);
+      expect(response.statusCode).toEqual(201);
+      expect(response.body).toEqual({ ...response.body, ...newAlbum });
+    });
+  });
 });
