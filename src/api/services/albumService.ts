@@ -17,9 +17,7 @@ export class AlbumService {
     return await this.albumRepository.getAlbumsById(id);
   };
 
-  createAlbum = async (
-    request: Request
-  ): Promise<Album> | never => {
+  createAlbum = async (request: Request): Promise<Album> | never => {
     const album: Album | null = await Album.findOne({
       where: { name: request.body.name },
     });

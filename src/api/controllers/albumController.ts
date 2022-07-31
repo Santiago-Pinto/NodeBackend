@@ -67,9 +67,10 @@ export class AlbumController {
       const result = await this.albumService.createAlbum(request);
       response.statusCode = statusCodes.CREATED;
       return response.json(result);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       response.statusCode = statusCodes.BAD_REQUEST;
-      return response.json({error: error.toString()});
+      return response.json({ error: error.toString() });
     }
   };
 }

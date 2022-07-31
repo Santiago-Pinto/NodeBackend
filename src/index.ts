@@ -1,4 +1,4 @@
-import express, { Application, json, urlencoded } from "express";
+import express, { Application, json } from "express";
 import { AlbumRouter } from "../src/api/routes/albumRoutes";
 import { Sequelize } from "sequelize";
 import { config } from "./api/config/config";
