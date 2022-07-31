@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, json, urlencoded } from "express";
 import { AlbumRouter } from "../src/api/routes/albumRoutes";
 import { Sequelize } from "sequelize";
 import { config } from "./api/config/config";
@@ -6,6 +6,7 @@ import { config } from "./api/config/config";
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 // Here go the routers
+app.use(json());
 app.use("/album", AlbumRouter); //This one already handles all calls with the /album prefix
 //
 

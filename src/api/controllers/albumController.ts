@@ -53,4 +53,38 @@ export class AlbumController {
       error: "No album with the provided id exists",
     });
   };
+
+  createAlbum = async (request: Request, response: Response) => {
+    const validationResult = validateAlbumData(request);
+    if (validationResult) {
+      response.statusCode = statusCodes.BAD_REQUEST;
+      return response.json({
+        error: validationResult,
+      });
+    }
+
+    try {
+      const result = await this.albumService.createAlbum(request);
+      response.statusCode = statusCodes.CREATED;
+      return response.json(result);
+    } catch (error: any) {
+      response.statusCode = statusCodes.BAD_REQUEST;
+      return response.json({error: error.toString()});
+    }
+  };
 }
+
+const validateAlbumData = (request: Request) => {
+  const albumData = request.body;
+  if (!request.body || !albumData.name) {
+    return "An album must have a name";
+  }
+
+  if (!albumData.year) {
+    return "An album must have a release year";
+  }
+
+  if (!albumData.band) {
+    return "An album must have a band associated";
+  }
+};
