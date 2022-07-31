@@ -1,5 +1,4 @@
 import express, { Application } from "express";
-import { TestRouter } from "../src/api/routes/testRoutes";
 import { AlbumRouter } from "../src/api/routes/albumRoutes";
 import { Sequelize } from "sequelize";
 import { config } from "./api/config/config";
