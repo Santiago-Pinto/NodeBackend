@@ -1,20 +1,45 @@
-import { AlbumRepository } from "../repositories/albumRepository";
 import { Album } from "../models/album";
 import { AlbumFilter } from "../models/filters/albumFilter";
 import { Request } from "express";
+import { Op } from "sequelize";
+import { DynamicObject } from "../utils/types";
 
 export class AlbumService {
-  albumRepository: AlbumRepository;
-  constructor() {
-    this.albumRepository = new AlbumRepository();
-  }
-
   getAlbums = async (filter: AlbumFilter): Promise<Album[]> => {
-    return await this.albumRepository.getAlbums(filter);
+    const { band, from, to } = filter.getFilter();
+    const queryFilter: DynamicObject = {};
+    if (band) {
+      queryFilter.band = {
+        [Op.iLike]: band,
+      };
+    }
+
+    switch (true) {
+      case from && !to:
+        queryFilter.year = { [Op.gte]: from };
+        break;
+
+      case !from && !!to:
+        queryFilter.year = { [Op.lte]: to };
+        break;
+
+      case !!from && !!to:
+        queryFilter.year = {
+          [Op.and]: {
+            [Op.gte]: from,
+            [Op.lte]: to,
+          },
+        };
+        break;
+    }
+    const albums: Album[] = await Album.findAll({
+      where: queryFilter,
+    });
+    return albums;
   };
 
   getAlbumById = async (id: number): Promise<Album | null> => {
-    return await this.albumRepository.getAlbumsById(id);
+    return await Album.findByPk(id);
   };
 
   createAlbum = async (request: Request): Promise<Album> | never => {
