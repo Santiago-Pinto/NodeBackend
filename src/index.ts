@@ -1,5 +1,4 @@
-import express, { Application } from "express";
-import { TestRouter } from "../src/api/routes/testRoutes";
+import express, { Application, json } from "express";
 import { AlbumRouter } from "../src/api/routes/albumRoutes";
 import { Sequelize } from "sequelize";
 import { config } from "./api/config/config";
@@ -7,7 +6,7 @@ import { config } from "./api/config/config";
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 // Here go the routers
-app.use(TestRouter);
+app.use(json());
 app.use("/album", AlbumRouter); //This one already handles all calls with the /album prefix
 //
 
@@ -25,10 +24,12 @@ const connectDB = async () => {
 };
 //
 
-app.listen(PORT, async () => {
-  await connectDB();
-  // eslint-disable-next-line no-console
-  console.log(`Server listening on port: ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, async () => {
+    await connectDB();
+    // eslint-disable-next-line no-console
+    console.log(`Server listening on port: ${PORT}`);
+  });
+}
 
 export default app; //Need to export the app for test purposes

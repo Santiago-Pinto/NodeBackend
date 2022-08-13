@@ -15,7 +15,7 @@ export class AlbumFilter {
       this.filter.from = from;
     }
 
-    if (to && from && to >= from) {
+    if (to || (to && from && to >= from)) {
       this.filter.to = to;
     }
   }

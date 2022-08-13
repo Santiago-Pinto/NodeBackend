@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 import { config } from "../config/config";
-const sequelize = new Sequelize(config.DB_URI);
+const sequelize = new Sequelize(config.DB_URI, { logging: false });
 
 export class Album extends Model {
   declare id: number;
@@ -37,10 +37,3 @@ Album.init(
     timestamps: false,
   }
 );
-
-/*export type Album = {
-  id: number;
-  name: string;
-  year: number;
-  band: string;
-};*/
