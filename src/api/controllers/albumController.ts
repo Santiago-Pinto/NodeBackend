@@ -69,12 +69,12 @@ export class AlbumController {
       return response.json(result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      response.statusCode = statusCodes.BAD_REQUEST;
-      return response.json({ error: error.toString() });
+      response.statusCode = error.statusCode;
+      return response.json({ error: error.message });
     }
   };
 
-  updateAlbum = async (request: Request, response: Response) => { 
+  updateAlbum = async (request: Request, response: Response) => {
     const validationResult = validateAlbumData(request);
     if (validationResult) {
       response.statusCode = statusCodes.BAD_REQUEST;
@@ -84,15 +84,32 @@ export class AlbumController {
     }
 
     try {
-      const result = await this.albumService.updateAlbum(request, parseInt(request.params.id));
+      const result = await this.albumService.updateAlbum(
+        request,
+        parseInt(request.params.id)
+      );
       response.statusCode = statusCodes.SUCCESS;
       return response.json(result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      response.statusCode = statusCodes.BAD_REQUEST;
-      return response.json({ error: error.toString() });
+      response.statusCode = error.statusCode;
+      return response.json({ error: error.message });
     }
-  }
+  };
+
+  deleteAlbum = async (request: Request, response: Response) => {
+    try {
+      const result = await this.albumService.deleteAlbum(
+        parseInt(request.params.id)
+      );
+      response.statusCode = statusCodes.SUCCESS;
+      return response.json(result);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      response.statusCode = error.statusCode;
+      return response.json({ error: error.message });
+    }
+  };
 }
 
 const validateAlbumData = (request: Request) => {

@@ -3,6 +3,7 @@ import { AlbumFilter } from "../models/filters/albumFilter";
 import { Request } from "express";
 import { Op } from "sequelize";
 import { DynamicObject } from "../utils/types";
+import { statusCodes } from "../utils/statusCodes";
 
 export class AlbumService {
   getAlbums = async (filter: AlbumFilter): Promise<Album[]> => {
@@ -44,11 +45,14 @@ export class AlbumService {
 
   createAlbum = async (request: Request): Promise<Album> | never => {
     const album: Album | null = await Album.findOne({
-      where: { name: request.body.name },
+      where: { name: request.body.name, band: request.body.band },
     });
 
     if (album) {
-      throw "An album with that name already exists";
+      throw {
+        message: "An album with that name for that band already exists",
+        statusCode: statusCodes.BAD_REQUEST,
+      };
     }
 
     return await Album.create(request.body);
@@ -61,9 +65,30 @@ export class AlbumService {
     const album: Album | null = await this.getAlbumById(id);
 
     if (!album) {
-      throw "Album not found";
+      throw { message: "Album not found", statusCode: statusCodes.NOT_FOUND };
+    }
+
+    const duplicatedAlbum: Album | null = await Album.findOne({
+      where: { name: request.body.name, band: request.body.band },
+    });
+
+    if (duplicatedAlbum) {
+      throw {
+        message: "An album with that name for that band already exists",
+        statusCode: statusCodes.BAD_REQUEST,
+      };
     }
 
     return await album.update({ id: request.body.id, ...request.body });
+  };
+
+  deleteAlbum = async (id: number): Promise<void> | never => {
+    const album: Album | null = await this.getAlbumById(id);
+
+    if (!album) {
+      throw { message: "Album not found", statusCode: statusCodes.NOT_FOUND };
+    }
+
+    await album.destroy();
   };
 }

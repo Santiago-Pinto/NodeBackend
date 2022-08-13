@@ -201,19 +201,30 @@ describe("Album Controller Tests", () => {
       );
     });
 
-    test("Should return error if an album with the same name already exists", async () => {
+    test("Should return error if an album with the same name for the given band already exists", async () => {
       const albumWithDuplicatedName = {
         name: "Test Album",
         year: 1987,
-        band: "New Band",
+        band: "Test Band",
       };
       const response = await supertest(app)
         .post(`/album`)
         .send(albumWithDuplicatedName);
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual(
-        "An album with that name already exists"
+        "An album with that name for that band already exists"
       );
+    });
+
+    test("Should return status code of 201 if an album with an existing name but for a different band is created", async () => {
+      const newAlbum = {
+        name: "Test Album",
+        year: 1987,
+        band: "Another Band",
+      };
+      const response = await supertest(app).post(`/album`).send(newAlbum);
+      expect(response.statusCode).toEqual(201);
+      expect(response.body).toEqual({ ...response.body, ...newAlbum });
     });
 
     test("Should return status code of 201 if an album is created", async () => {
@@ -244,7 +255,13 @@ describe("Album Controller Tests", () => {
     });
   });
 
-  describe("PUT album/", () => {
+  describe("PUT album/{id}", () => {
+    const updatedAlbum = {
+      name: "New Album name",
+      year: 1990,
+      band: "New Band name",
+    };
+
     test("Should return error if the request has no body", async () => {
       const response = await supertest(app).put(`/album/${highestAlbumId}`);
       expect(response.statusCode).toEqual(400);
@@ -252,9 +269,11 @@ describe("Album Controller Tests", () => {
     });
 
     test("Should return error if there is no album for the given id", async () => {
-      const response = await supertest(app).put(`/album/${highestAlbumId + 1}`);
+      const response = await supertest(app)
+        .put(`/album/${highestAlbumId + 1}`)
+        .send(updatedAlbum);
       expect(response.statusCode).toEqual(404);
-      expect(response.body.error).toBe("No album found");
+      expect(response.body.error).toBe("Album not found");
     });
 
     test("Should return error if the album has no name", async () => {
@@ -263,7 +282,7 @@ describe("Album Controller Tests", () => {
         band: "Test Band",
       };
       const response = await supertest(app)
-        .post(`/album`)
+        .put(`/album/${highestAlbumId}`)
         .send(albumWithNoName);
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual("An album must have a name");
@@ -275,7 +294,7 @@ describe("Album Controller Tests", () => {
         band: "Test Band",
       };
       const response = await supertest(app)
-        .post(`/album`)
+        .put(`/album/${highestAlbumId}`)
         .send(albumWithNoYear);
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual("An album must have a release year");
@@ -287,24 +306,61 @@ describe("Album Controller Tests", () => {
         year: 1987,
       };
       const response = await supertest(app)
-        .post(`/album`)
+        .put(`/album/${highestAlbumId}`)
         .send(albumWithNoBand);
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual(
         "An album must have a band associated"
       );
     });
-    test("Should return the new values if succeded", async () => {
-      const updatedAlbum = {
-        name: "New Album name",
-        year: 1990,
-        band: "New Band name",
-      };
+
+    test("Should return error if the new album name exists for the given band", async () => {
+      const response = await supertest(app)
+        .put(`/album/${highestAlbumId}`)
+        .send({ ...updatedAlbum, name: "Test Album", band: "Test Band" });
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual(
+        "An album with that name for that band already exists"
+      );
+    });
+
+    test("Should succeed if a band changes an albums name for another that already exists for another band", async () => {
+      const response = await supertest(app)
+        .put(`/album/${highestAlbumId}`)
+        .send({ ...updatedAlbum, name: "Test Album", band: "Another Band" });
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        id: highestAlbumId,
+        ...updatedAlbum,
+        name: "Test Album",
+        band: "Another Band",
+      });
+    });
+
+    test("Should return the new values if succeeded", async () => {
       const response = await supertest(app)
         .put(`/album/${highestAlbumId}`)
         .send(updatedAlbum);
       expect(response.statusCode).toEqual(200);
       expect(response.body).toEqual({ id: highestAlbumId, ...updatedAlbum });
+    });
+  });
+
+  describe("DELETE album/{id}", () => {
+    test("Should return error if there is no album for the given id", async () => {
+      const response = await supertest(app).delete(
+        `/album/${highestAlbumId + 1}`
+      );
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.error).toBe("Album not found");
+    });
+
+    test("Should return status code of 200 if succeeded", async () => {
+      const response = await supertest(app).delete(`/album/${highestAlbumId}`);
+      expect(response.statusCode).toEqual(200);
+
+      const allAlbums = await Album.findAll();
+      expect(allAlbums.length).toEqual(2);
     });
   });
 });
