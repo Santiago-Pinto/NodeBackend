@@ -53,4 +53,17 @@ export class AlbumService {
 
     return await Album.create(request.body);
   };
+
+  updateAlbum = async (
+    request: Request,
+    id: number
+  ): Promise<Album> | never => {
+    const album: Album | null = await this.getAlbumById(id);
+
+    if (!album) {
+      throw "Album not found";
+    }
+
+    return await album.update({ id: request.body.id, ...request.body });
+  };
 }

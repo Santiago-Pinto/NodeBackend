@@ -8,5 +8,6 @@ const albumController = new AlbumController();
 router.get("/", albumController.getAlbums);
 router.get("/:id", albumController.getAlbumById);
 router.post("/", albumController.createAlbum);
+router.put("/:id", albumController.updateAlbum);
 
 export { router as AlbumRouter };

@@ -227,4 +227,84 @@ describe("Album Controller Tests", () => {
       expect(response.body).toEqual({ ...response.body, ...newAlbum });
     });
   });
+
+  describe("GET album/{id}", () => {
+    test("Should return status code of 404 if no album is found", async () => {
+      //Since highestAlbumId grants no other album was created after, i just simply increase it by one to force a nonexisting id
+      const response = await supertest(app).get(`/album/${++highestAlbumId}`);
+      expect(response.statusCode).toEqual(404);
+    });
+
+    test("Should return status code of 200 if an album is found", async () => {
+      const response = await supertest(app).get(`/album/${highestAlbumId}`);
+      expect(response.statusCode).toEqual(200);
+      expect(response.body.name).toEqual(testAlbums[2].name);
+      expect(response.body.year).toEqual(testAlbums[2].year);
+      expect(response.body.band).toEqual(testAlbums[2].band);
+    });
+  });
+
+  describe("PUT album/", () => {
+    test("Should return error if the request has no body", async () => {
+      const response = await supertest(app).put(`/album/${highestAlbumId}`);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toBe("Invalid request, missing request body");
+    });
+
+    test("Should return error if there is no album for the given id", async () => {
+      const response = await supertest(app).put(`/album/${highestAlbumId + 1}`);
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.error).toBe("No album found");
+    });
+
+    test("Should return error if the album has no name", async () => {
+      const albumWithNoName = {
+        year: 1987,
+        band: "Test Band",
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithNoName);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("An album must have a name");
+    });
+
+    test("Should return error if the album has no release year", async () => {
+      const albumWithNoYear = {
+        name: "New Album",
+        band: "Test Band",
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithNoYear);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("An album must have a release year");
+    });
+
+    test("Should return error if the album has no band", async () => {
+      const albumWithNoBand = {
+        name: "New Album",
+        year: 1987,
+      };
+      const response = await supertest(app)
+        .post(`/album`)
+        .send(albumWithNoBand);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual(
+        "An album must have a band associated"
+      );
+    });
+    test("Should return the new values if succeded", async () => {
+      const updatedAlbum = {
+        name: "New Album name",
+        year: 1990,
+        band: "New Band name",
+      };
+      const response = await supertest(app)
+        .put(`/album/${highestAlbumId}`)
+        .send(updatedAlbum);
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({ id: highestAlbumId, ...updatedAlbum });
+    });
+  });
 });

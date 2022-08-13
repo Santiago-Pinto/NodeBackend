@@ -73,6 +73,26 @@ export class AlbumController {
       return response.json({ error: error.toString() });
     }
   };
+
+  updateAlbum = async (request: Request, response: Response) => { 
+    const validationResult = validateAlbumData(request);
+    if (validationResult) {
+      response.statusCode = statusCodes.BAD_REQUEST;
+      return response.json({
+        error: validationResult,
+      });
+    }
+
+    try {
+      const result = await this.albumService.updateAlbum(request, parseInt(request.params.id));
+      response.statusCode = statusCodes.SUCCESS;
+      return response.json(result);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      response.statusCode = statusCodes.BAD_REQUEST;
+      return response.json({ error: error.toString() });
+    }
+  }
 }
 
 const validateAlbumData = (request: Request) => {
