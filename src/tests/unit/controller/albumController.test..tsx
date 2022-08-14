@@ -77,6 +77,18 @@ describe("Album Controller Tests", () => {
       });
     });
 
+    test("Should return albums released up to the 'to' filter", async () => {
+      const response = await supertest(app).get("/album?to=1994");
+      expect(response.body).toHaveLength(1);
+      expect(response.statusCode).toEqual(200);
+
+      const filteredAlbums: Album[] = response.body;
+
+      filteredAlbums.forEach((album) => {
+        expect(album.year).toBeLessThanOrEqual(1994);
+      });
+    });
+
     test("Should return albums between 'from' and 'to' filters", async () => {
       const from = 1980;
       const to = 2000;
