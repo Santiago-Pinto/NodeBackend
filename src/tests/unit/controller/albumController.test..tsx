@@ -239,22 +239,6 @@ describe("Album Controller Tests", () => {
     });
   });
 
-  describe("GET album/{id}", () => {
-    test("Should return status code of 404 if no album is found", async () => {
-      //Since highestAlbumId grants no other album was created after, i just simply increase it by one to force a nonexisting id
-      const response = await supertest(app).get(`/album/${++highestAlbumId}`);
-      expect(response.statusCode).toEqual(404);
-    });
-
-    test("Should return status code of 200 if an album is found", async () => {
-      const response = await supertest(app).get(`/album/${highestAlbumId}`);
-      expect(response.statusCode).toEqual(200);
-      expect(response.body.name).toEqual(testAlbums[2].name);
-      expect(response.body.year).toEqual(testAlbums[2].year);
-      expect(response.body.band).toEqual(testAlbums[2].band);
-    });
-  });
-
   describe("PUT album/{id}", () => {
     const updatedAlbum = {
       name: "New Album name",
