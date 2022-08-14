@@ -1,9 +1,9 @@
 import { Album } from "../models/album";
 import { AlbumFilter } from "../models/filters/albumFilter";
-import { Request } from "express";
 import { Op } from "sequelize";
 import { DynamicObject } from "../utils/types";
-import { statusCodes } from "../utils/statusCodes";
+import { NotFoundException } from "../models/exceptions/NotFoundException";
+import { BadRequestException } from "../models/exceptions/BadRequestException";
 
 export class AlbumService {
   getAlbums = async (filter: AlbumFilter): Promise<Album[]> => {
@@ -33,60 +33,63 @@ export class AlbumService {
         };
         break;
     }
-    const albums: Album[] = await Album.findAll({
+    const albums = await Album.findAll({
       where: queryFilter,
     });
     return albums;
   };
 
   getAlbumById = async (id: number): Promise<Album | null> => {
-    return await Album.findByPk(id);
+    const album = await Album.findByPk(id);
+
+    if (album) {
+      return album;
+    }
+    throw new NotFoundException("Album not found");
   };
 
-  createAlbum = async (request: Request): Promise<Album> | never => {
-    const album: Album | null = await Album.findOne({
-      where: { name: request.body.name, band: request.body.band },
+  createAlbum = async (params: Omit<Album, "id">): Promise<Album> => {
+    const album = await Album.findOne({
+      where: { name: params.name, band: params.band },
     });
 
     if (album) {
-      throw {
-        message: "An album with that name for that band already exists",
-        statusCode: statusCodes.BAD_REQUEST,
-      };
+      throw new BadRequestException(
+        "An album with that name for that band already exists"
+      );
     }
 
-    return await Album.create(request.body);
+    return await Album.create(params);
   };
 
   updateAlbum = async (
-    request: Request,
+    params: Omit<Album, "id">,
     id: number
-  ): Promise<Album> | never => {
-    const album: Album | null = await this.getAlbumById(id);
+  ): Promise<Album> => {
+    const album = await this.getAlbumById(id);
 
     if (!album) {
-      throw { message: "Album not found", statusCode: statusCodes.NOT_FOUND };
+      throw new NotFoundException("Album not found");
     }
 
-    const duplicatedAlbum: Album | null = await Album.findOne({
-      where: { name: request.body.name, band: request.body.band },
+    const duplicatedAlbum = await Album.findOne({
+      where: { name: params.name, band: params.band },
     });
 
     if (duplicatedAlbum) {
-      throw {
-        message: "An album with that name for that band already exists",
-        statusCode: statusCodes.BAD_REQUEST,
-      };
+      throw new BadRequestException(
+        "An album with that name for that band already exists"
+      );
     }
 
-    return await album.update({ id: request.body.id, ...request.body });
+    return await album.update({ id: id, ...params });
   };
 
-  deleteAlbum = async (id: number): Promise<void> | never => {
-    const album: Album | null = await this.getAlbumById(id);
+  deleteAlbum = async (id: number): Promise<void> => {
+    const album = await this.getAlbumById(id);
 
     if (!album) {
-      throw { message: "Album not found", statusCode: statusCodes.NOT_FOUND };
+      throw new NotFoundException("Album not found");
     }
 
     await album.destroy();

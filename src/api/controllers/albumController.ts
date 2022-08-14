@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { AlbumService } from "../services/albumService";
 import { statusCodes } from "../utils/statusCodes";
 import { AlbumFilter } from "../models/filters/albumFilter";
+import { NotFoundException } from "../models/exceptions/NotFoundException";
+import { BadRequestException } from "../models/exceptions/BadRequestException";
 
 export class AlbumController {
   albumService: AlbumService;
@@ -28,72 +30,89 @@ export class AlbumController {
     const albums = await this.albumService.getAlbums(albumFilter);
 
     if (albums.length > 0) {
-      response.statusCode = statusCodes.SUCCESS;
-      return response.json(albums);
+      return response.status(statusCodes.SUCCESS).json(albums);
     }
 
-    response.statusCode = statusCodes.NOT_FOUND;
-    return response.json({
+    return response.status(statusCodes.NOT_FOUND).json({
       error: "No albums were found for the parameters provided",
     });
   };
 
   getAlbumById = async (request: Request, response: Response) => {
-    const result = await this.albumService.getAlbumById(
-      parseInt(request.params.id)
-    );
+    try {
+      const result = await this.albumService.getAlbumById(
+        parseInt(request.params.id)
+      );
 
-    if (result) {
-      response.statusCode = statusCodes.SUCCESS;
-      return response.json(result);
+      return response.status(statusCodes.SUCCESS).json(result);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        return response
+          .status(statusCodes.NOT_FOUND)
+          .json({ error: error.message });
+      }
+
+      return response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
     }
-
-    response.statusCode = statusCodes.NOT_FOUND;
-    return response.json({
-      error: "No album with the provided id exists",
-    });
   };
 
   createAlbum = async (request: Request, response: Response) => {
     const validationResult = validateAlbumData(request);
     if (validationResult) {
-      response.statusCode = statusCodes.BAD_REQUEST;
-      return response.json({
+      return response.status(statusCodes.BAD_REQUEST).json({
         error: validationResult,
       });
     }
 
     try {
-      const result = await this.albumService.createAlbum(request);
-      response.statusCode = statusCodes.CREATED;
-      return response.json(result);
+      const result = await this.albumService.createAlbum(request.body);
+      return response.status(statusCodes.CREATED).json(result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      response.statusCode = error.statusCode;
-      return response.json({ error: error.message });
+      if (error instanceof BadRequestException) {
+        return response
+          .status(statusCodes.BAD_REQUEST)
+          .json({ error: error.message });
+      }
+      return response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
     }
   };
 
   updateAlbum = async (request: Request, response: Response) => {
     const validationResult = validateAlbumData(request);
     if (validationResult) {
-      response.statusCode = statusCodes.BAD_REQUEST;
-      return response.json({
+      return response.status(statusCodes.BAD_REQUEST).json({
         error: validationResult,
       });
     }
 
     try {
       const result = await this.albumService.updateAlbum(
-        request,
+        request.body,
         parseInt(request.params.id)
       );
-      response.statusCode = statusCodes.SUCCESS;
-      return response.json(result);
+      return response.status(statusCodes.SUCCESS).json(result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      response.statusCode = error.statusCode;
-      return response.json({ error: error.message });
+      if (error instanceof NotFoundException) {
+        return response
+          .status(statusCodes.NOT_FOUND)
+          .json({ error: error.message });
+      }
+
+      if (error instanceof BadRequestException) {
+        return response
+          .status(statusCodes.BAD_REQUEST)
+          .json({ error: error.message });
+      }
+      return response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
     }
   };
 
@@ -102,12 +121,17 @@ export class AlbumController {
       const result = await this.albumService.deleteAlbum(
         parseInt(request.params.id)
       );
-      response.statusCode = statusCodes.SUCCESS;
-      return response.json(result);
+      return response.status(statusCodes.SUCCESS).json(result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      response.statusCode = error.statusCode;
-      return response.json({ error: error.message });
+      if (error instanceof NotFoundException) {
+        return response
+          .status(statusCodes.NOT_FOUND)
+          .json({ error: error.message });
+      }
+      return response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
     }
   };
 }
