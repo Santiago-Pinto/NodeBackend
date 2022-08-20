@@ -1,21 +1,8 @@
 import supertest from "supertest";
 import { describe, test, expect } from "@jest/globals";
 import app from "../../../index";
-import { Sequelize } from "sequelize";
-import { config } from "../../../api/config/config";
 import { Album } from "../../../api/models/album";
-
-let sequelize: Sequelize;
-
-const connectDB = async () => {
-  sequelize = new Sequelize(config.DB_URI, { logging: false });
-  try {
-    await sequelize.authenticate();
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("Unable to connect to the database:", error);
-  }
-};
+import db from "../../../api/config/db";
 
 const testAlbums = [
   { name: "Test Album", year: 1987, band: "Test Band" },
@@ -27,19 +14,19 @@ let highestAlbumId: number;
 
 describe("Album Controller Tests", () => {
   beforeEach(async () => {
-    await connectDB();
-    // To Do: Find a way to use forEach instead of this. I tried, but some async issues are occuring.
-
-    await Album.create(testAlbums[0]);
-    await Album.create(testAlbums[1]);
-    const response = await Album.create(testAlbums[2]);
-
+    let response: any;
+    for (const album of testAlbums) {
+      response = await Album.create(album);
+    }
     highestAlbumId = response.id;
   });
 
   afterEach(async () => {
     await Album.destroy({ truncate: true });
-    await sequelize.close();
+  });
+
+  afterAll(async () => {
+    await db.connection.close();
   });
 
   describe("GET album/", () => {
@@ -157,6 +144,7 @@ describe("Album Controller Tests", () => {
     test("Should return status code of 404 if no album is found", async () => {
       //Since highestAlbumId grants no other album was created after, i just simply increase it by one to force a nonexisting id
       const response = await supertest(app).get(`/album/${++highestAlbumId}`);
+      expect(response.body.error).toBe("Album not found");
       expect(response.statusCode).toEqual(404);
     });
 

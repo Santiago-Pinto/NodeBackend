@@ -1,7 +1,6 @@
 import express, { Application, json } from "express";
 import { AlbumRouter } from "../src/api/routes/albumRoutes";
-import { Sequelize } from "sequelize";
-import { config } from "./api/config/config";
+import db from "./api/config/db";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -11,10 +10,9 @@ app.use("/album", AlbumRouter); //This one already handles all calls with the /a
 //
 
 //DB connection
-const connectDB = async () => {
-  const sequelize = new Sequelize(config.DB_URI);
+const testConnection = async () => {
   try {
-    await sequelize.authenticate();
+    await db.connection.authenticate(); // Just checks if the connection to the DB was successful, can be removed
     // eslint-disable-next-line no-console
     console.log("Connection has been established successfully.");
   } catch (error) {
@@ -26,7 +24,7 @@ const connectDB = async () => {
 
 if (process.env.NODE_ENV !== "test") {
   app.listen(PORT, async () => {
-    await connectDB();
+    await testConnection();
     // eslint-disable-next-line no-console
     console.log(`Server listening on port: ${PORT}`);
   });
