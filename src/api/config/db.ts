@@ -1,8 +1,8 @@
 import { Sequelize } from "sequelize";
 import { DynamicObject } from "../utils/types";
 import { config } from "./config";
-//import fs from "fs";
-//import path from "path";
+import fs from "fs";
+import path from "path";
 
 const sync = async (connection: Sequelize) => {
   try {
@@ -14,17 +14,15 @@ const sync = async (connection: Sequelize) => {
   }
 };
 
-const dbConnection = new Sequelize(config.DB_URI, {
+const connection = new Sequelize(config.DB_URI, {
   logging: false,
 }); // Connects to the Database
 
 const db: DynamicObject = {};
 
-/*
-const modelsFileExtensions = ["ts", "tsx"];
+const modelsFileExtensions = ["ts", "tsx", "js"];
 
 const modelsDirectory = path.normalize(`${__dirname}/../models`); // Returns the path to reach the folder with the models base on the location of this file
-
 
 // For a given path fs.readdirSync returns an array with all the files and folders contained on that path
 fs.readdirSync(modelsDirectory)
@@ -34,17 +32,17 @@ fs.readdirSync(modelsDirectory)
   })
   .forEach(async (file) => {
     const model = await import(path.join(modelsDirectory, file));
-    //db[Object.keys(model)[0]] = Object.keys(model)[0];
+    db[Object.keys(model)[0]] = Object.values(model)[0];
   });
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
-});*/
+});
 
-db.connection = dbConnection;
+db.connection = connection;
 
-sync(dbConnection);
+sync(connection);
 
 export default db;
