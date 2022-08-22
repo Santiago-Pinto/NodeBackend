@@ -1,3 +1,12 @@
+# NodeBackend
+
+Node Backend with some basic endpoints, a database connection and some configs
+
+## Commands
+
+### `npm run dev`
+
+To run the server locally
 
 ### `npm run lint`
 
