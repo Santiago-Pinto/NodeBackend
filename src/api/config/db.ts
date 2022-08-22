@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 import { DynamicObject } from "../utils/types";
-import { config } from "./config";
+import { config } from "./appConfig";
 import fs from "fs";
 import path from "path";
 
