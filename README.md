@@ -26,5 +26,5 @@ npx sequelize-cli db:create --env <env_from_config.json>
 ### Run migrations
 
 ```
-npx sequelize-cli db:migrate --env <env_env_from_config.json>
+npx sequelize-cli db:migrate --env <env_from_config.json>
 ```
