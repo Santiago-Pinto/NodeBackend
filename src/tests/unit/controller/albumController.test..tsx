@@ -5,9 +5,17 @@ import { Album } from "../../../api/models/album";
 import db from "../../../api/config/db";
 
 const testAlbums = [
-  { name: "Test Album", year: 1987, band: "Test Band" },
-  { name: "Test Album 2", year: 2005, band: "Test Band" },
-  { name: "Test Album 3", year: 1995, band: "Another Band" },
+  { name: "Album 1", year: 1987, band: "Band A" },
+  { name: "Album 2", year: 1989, band: "Band A" },
+  { name: "Album 3", year: 1994, band: "Band A" },
+  { name: "Album 4", year: 1997, band: "Band A" },
+  { name: "Album 5", year: 2000, band: "Band A" },
+  { name: "Album 6", year: 1990, band: "Band B" },
+  { name: "Album 7", year: 1995, band: "Band B" },
+  { name: "Album 8", year: 1998, band: "Band B" },
+  { name: "Album 9", year: 2001, band: "Band C" },
+  { name: "Album 10", year: 2008, band: "Band C" },
+
 ];
 
 let highestAlbumId: number;
@@ -42,19 +50,17 @@ describe("Album Controller Tests", () => {
     });
 
     test("Should return albums filtered based on band", async () => {
-      const response = await supertest(app).get("/album?band=Another Band");
-      expect(response.body).toHaveLength(1);
+      const response = await supertest(app).get("/album?band=Band B");
+      expect(response.body).toHaveLength(3);
       expect(response.statusCode).toEqual(200);
 
       const filteredAlbum: Album = response.body[0];
-      expect(filteredAlbum.name).toBe("Test Album 3");
-      expect(filteredAlbum.year).toBe(1995);
-      expect(filteredAlbum.band).toBe("Another Band");
+      expect(filteredAlbum.band).toBe("Band B");
     });
 
     test("Should return albums released after the 'from' filter", async () => {
       const response = await supertest(app).get("/album?from=1994");
-      expect(response.body).toHaveLength(2);
+      expect(response.body).toHaveLength(7);
       expect(response.statusCode).toEqual(200);
 
       const filteredAlbums: Album[] = response.body;
@@ -66,7 +72,7 @@ describe("Album Controller Tests", () => {
 
     test("Should return albums released up to the 'to' filter", async () => {
       const response = await supertest(app).get("/album?to=1994");
-      expect(response.body).toHaveLength(1);
+      expect(response.body).toHaveLength(4);
       expect(response.statusCode).toEqual(200);
 
       const filteredAlbums: Album[] = response.body;
@@ -77,10 +83,10 @@ describe("Album Controller Tests", () => {
     });
 
     test("Should return albums between 'from' and 'to' filters", async () => {
-      const from = 1980;
+      const from = 1990;
       const to = 2000;
       const response = await supertest(app).get(`/album?from=${from}&to=${to}`);
-      expect(response.body).toHaveLength(2);
+      expect(response.body).toHaveLength(6);
       expect(response.statusCode).toEqual(200);
 
       const filteredAlbums: Album[] = response.body;
@@ -92,13 +98,13 @@ describe("Album Controller Tests", () => {
     });
 
     test("Should return albums between 'from' and 'to' filters and with the band specified on the filter", async () => {
-      const from = 1980;
-      const to = 2000;
-      const band = "Test Band";
+      const from = 1990;
+      const to = 1999;
+      const band = "Band A";
       const response = await supertest(app).get(
         `/album?from=${from}&to=${to}&band=${band}`
       );
-      expect(response.body).toHaveLength(1);
+      expect(response.body).toHaveLength(2);
       expect(response.statusCode).toEqual(200);
 
       const filteredAlbums: Album[] = response.body;
@@ -107,7 +113,6 @@ describe("Album Controller Tests", () => {
         expect(album.year).toBeLessThanOrEqual(to);
         expect(album.year).toBeGreaterThanOrEqual(from);
         expect(album.band).toBe(band);
-        expect(album.name).toBe("Test Album");
       });
     });
 
@@ -151,9 +156,9 @@ describe("Album Controller Tests", () => {
     test("Should return status code of 200 if an album is found", async () => {
       const response = await supertest(app).get(`/album/${highestAlbumId}`);
       expect(response.statusCode).toEqual(200);
-      expect(response.body.name).toEqual(testAlbums[2].name);
-      expect(response.body.year).toEqual(testAlbums[2].year);
-      expect(response.body.band).toEqual(testAlbums[2].band);
+      expect(response.body.name).toEqual(testAlbums[testAlbums.length - 1].name);
+      expect(response.body.year).toEqual(testAlbums[testAlbums.length - 1].year);
+      expect(response.body.band).toEqual(testAlbums[testAlbums.length - 1].band);
     });
   });
 
@@ -166,7 +171,7 @@ describe("Album Controller Tests", () => {
     test("Should return error if the album has no name", async () => {
       const albumWithNoName = {
         year: 1987,
-        band: "Test Band",
+        band: "Band A",
       };
       const response = await supertest(app)
         .post(`/album`)
@@ -178,7 +183,7 @@ describe("Album Controller Tests", () => {
     test("Should return error if the album has no release year", async () => {
       const albumWithNoYear = {
         name: "New Album",
-        band: "Test Band",
+        band: "Band A",
       };
       const response = await supertest(app)
         .post(`/album`)
@@ -203,9 +208,9 @@ describe("Album Controller Tests", () => {
 
     test("Should return error if an album with the same name for the given band already exists", async () => {
       const albumWithDuplicatedName = {
-        name: "Test Album",
+        name: "Album 3",
         year: 1987,
-        band: "Test Band",
+        band: "Band A",
       };
       const response = await supertest(app)
         .post(`/album`)
@@ -220,7 +225,7 @@ describe("Album Controller Tests", () => {
       const newAlbum = {
         name: "Test Album",
         year: 1987,
-        band: "Another Band",
+        band: "Band B",
       };
       const response = await supertest(app).post(`/album`).send(newAlbum);
       expect(response.statusCode).toEqual(201);
@@ -263,7 +268,7 @@ describe("Album Controller Tests", () => {
     test("Should return error if the album has no name", async () => {
       const albumWithNoName = {
         year: 1987,
-        band: "Test Band",
+        band: "Band A",
       };
       const response = await supertest(app)
         .put(`/album/${highestAlbumId}`)
@@ -275,7 +280,7 @@ describe("Album Controller Tests", () => {
     test("Should return error if the album has no release year", async () => {
       const albumWithNoYear = {
         name: "New Album",
-        band: "Test Band",
+        band: "Band A",
       };
       const response = await supertest(app)
         .put(`/album/${highestAlbumId}`)
@@ -301,7 +306,7 @@ describe("Album Controller Tests", () => {
     test("Should return error if the new album name exists for the given band", async () => {
       const response = await supertest(app)
         .put(`/album/${highestAlbumId}`)
-        .send({ ...updatedAlbum, name: "Test Album", band: "Test Band" });
+        .send({ ...updatedAlbum, name: "Album 4", band: "Band A" });
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual(
         "An album with that name for that band already exists"
@@ -311,13 +316,13 @@ describe("Album Controller Tests", () => {
     test("Should succeed if a band changes an albums name for another that already exists for another band", async () => {
       const response = await supertest(app)
         .put(`/album/${highestAlbumId}`)
-        .send({ ...updatedAlbum, name: "Test Album", band: "Another Band" });
+        .send({ ...updatedAlbum, name: "Test Album", band: "Band B" });
       expect(response.statusCode).toEqual(200);
       expect(response.body).toEqual({
         id: highestAlbumId,
         ...updatedAlbum,
         name: "Test Album",
-        band: "Another Band",
+        band: "Band B",
       });
     });
 
@@ -344,7 +349,7 @@ describe("Album Controller Tests", () => {
       expect(response.statusCode).toEqual(200);
 
       const allAlbums = await Album.findAll();
-      expect(allAlbums.length).toEqual(2);
+      expect(allAlbums.length).toEqual(testAlbums.length - 1);
     });
   });
 });
