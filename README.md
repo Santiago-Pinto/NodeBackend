@@ -24,7 +24,7 @@ To run tests
 - Fill the fields of the "config/config.json" file
 - Create the environment files (development.env/test.env/etc) following the structure from api/config/.env.example (Fields must match with the content of the config.json file from the the previous step)
 
-#### `The following commands must be executed for each environment (These have to be executed while standing on src/api`
+#### `The following commands must be executed for each environment (These have to be executed while standing on src/api)`
 
 ### Create an environment database
 

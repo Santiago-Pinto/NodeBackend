@@ -11,5 +11,5 @@ export const config = {
   PORT: process.env.PORT || 3000,
   DB_URI:
     process.env.DB_URI ||
-    `postgres://localhost:${process.env.DB_PASS}@localhost:5432/Node-Backend-DB`,
+    `postgres://localhost:${process.env.DB_PASS}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}`,
 };
