@@ -20,7 +20,7 @@ const connection = new Sequelize(config.DB_URI, {
 
 const db: DynamicObject = {};
 
-const modelsFileExtensions = ["ts", "tsx", "js"];
+const modelsFileExtensions = ["ts", "tsx"];
 
 const modelsDirectory = path.normalize(`${__dirname}/../models`); // Returns the path to reach the folder with the models base on the location of this file
 

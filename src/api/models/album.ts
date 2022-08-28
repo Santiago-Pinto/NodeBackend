@@ -1,4 +1,5 @@
 import { DataTypes, Model } from "sequelize";
+import { Song } from "./song";
 import db from "../config/db";
 
 export class Album extends Model {
@@ -36,3 +37,5 @@ Album.init(
     timestamps: false,
   }
 );
+
+Album.hasMany(Song, { foreignKey: "albumId", onDelete: "CASCADE" });
