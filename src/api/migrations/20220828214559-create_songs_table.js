@@ -16,6 +16,7 @@ module.exports = {
       albumId: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
+        /** Is this required? **/
         references: {
           key: "id",
           model: {
@@ -23,6 +24,7 @@ module.exports = {
           },
           as: "albumId",
         },
+        /***********************/
       },
     });
   },

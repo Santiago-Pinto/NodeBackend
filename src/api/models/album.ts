@@ -38,4 +38,10 @@ Album.init(
   }
 );
 
-Album.hasMany(Song, { foreignKey: "albumId", onDelete: "CASCADE" });
+// Not sure if it's a bug in Sequelize, but for some reason the foreign key has to be indicated in both sides of the association
+Album.hasMany(Song, {
+  foreignKey: "albumId",
+  onDelete: "CASCADE",
+  constraints: false,
+});
+Song.belongsTo(Album, { foreignKey: "albumId" });

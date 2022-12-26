@@ -35,11 +35,14 @@ fs.readdirSync(modelsDirectory)
     db[Object.keys(model)[0]] = Object.values(model)[0];
   });
 
+
+/** Is this required? **/
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
+/***********************/
 
 db.connection = connection;
 

@@ -1,6 +1,5 @@
 import { DataTypes, Model } from "sequelize";
 import db from "../config/db";
-import { Album } from "./album";
 
 export class Song extends Model {
   declare id: number;
