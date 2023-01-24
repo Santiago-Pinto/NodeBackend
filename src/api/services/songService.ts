@@ -24,6 +24,7 @@ export class SongService {
     const songs = await Song.findAll({
       include: {
         model: Album,
+        as: "album",
         where: queryFilter,
         attributes: ["name", "year"], // These are the fields that we want to keep from the right side table of the join (In this case Album)
       },

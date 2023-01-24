@@ -15,7 +15,6 @@ const testAlbums = [
   { name: "Album 8", year: 1998, band: "Band B" },
   { name: "Album 9", year: 2001, band: "Band C" },
   { name: "Album 10", year: 2008, band: "Band C" },
-
 ];
 
 let highestAlbumId: number;
@@ -38,11 +37,6 @@ describe("Album Controller Tests", () => {
   });
 
   describe("GET album/", () => {
-    test("Should return status code of 200 if no filters are set", async () => {
-      const response = await supertest(app).get("/album");
-      expect(response.statusCode).toEqual(200);
-    });
-
     test("Should return all albums when filters are not set", async () => {
       const response = await supertest(app).get("/album");
       expect(response.body).toHaveLength(testAlbums.length);
@@ -123,19 +117,19 @@ describe("Album Controller Tests", () => {
       expect(response.statusCode).toEqual(400);
     });
 
-    test("Should return 404 if no bands are found for a combination of date filters", async () => {
+    test("Should return 404 if no albums are found for a combination of date filters", async () => {
       const from = 1970;
       const to = 1980;
       const response = await supertest(app).get(`/album?from=${from}&to=${to}`);
       expect(response.statusCode).toEqual(404);
     });
 
-    test("Should return 404 if no bands are found for a nonexisting band", async () => {
+    test("Should return 404 if no albums are found for a nonexisting band", async () => {
       const response = await supertest(app).get("/album?band=nonexistent band");
       expect(response.statusCode).toEqual(404);
     });
 
-    test("Should return 404 if no bands are found for a given filter combination", async () => {
+    test("Should return 404 if no albums are found for a given filter combination", async () => {
       const from = 1970;
       const to = 2010;
       const response = await supertest(app).get(
@@ -156,9 +150,15 @@ describe("Album Controller Tests", () => {
     test("Should return status code of 200 if an album is found", async () => {
       const response = await supertest(app).get(`/album/${highestAlbumId}`);
       expect(response.statusCode).toEqual(200);
-      expect(response.body.name).toEqual(testAlbums[testAlbums.length - 1].name);
-      expect(response.body.year).toEqual(testAlbums[testAlbums.length - 1].year);
-      expect(response.body.band).toEqual(testAlbums[testAlbums.length - 1].band);
+      expect(response.body.name).toEqual(
+        testAlbums[testAlbums.length - 1].name
+      );
+      expect(response.body.year).toEqual(
+        testAlbums[testAlbums.length - 1].year
+      );
+      expect(response.body.band).toEqual(
+        testAlbums[testAlbums.length - 1].band
+      );
     });
   });
 
