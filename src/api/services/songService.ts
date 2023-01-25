@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import { Album } from "../models/album";
+import { NotFoundException } from "../models/exceptions/NotFoundException";
 import { SongFilter } from "../models/filters/songFilter";
 import { Song } from "../models/song";
 import { DynamicObject } from "../utils/types";
@@ -31,5 +32,19 @@ export class SongService {
     });
 
     return songs;
+  };
+
+  createSong = async (name: string, albumId: number): Promise<Song> => {
+    const queryFilter: DynamicObject = {};
+
+    queryFilter.albumId = { [Op.eq]: albumId };
+
+    const songAlbum = await Song.findOne({ where: queryFilter });
+
+    if (!songAlbum) {
+      throw new NotFoundException("Album not found");
+    }
+
+    return Song.create({ name, albumId });
   };
 }

@@ -1,9 +1,9 @@
 import supertest from "supertest";
 import { describe, test, expect } from "@jest/globals";
-import app from "../../../index";
-import { Album } from "../../../api/models/album";
-import { Song } from "../../../api/models/song";
-import db from "../../../api/config/db";
+import app from "../../index";
+import { Album } from "../../api/models/album";
+import { Song } from "../../api/models/song";
+import db from "../../api/config/db";
 
 const testAlbums = [
   { name: "Album 1", year: 1987, band: "Band A" },
@@ -31,7 +31,7 @@ const testSongs = [
 let highestAlbumId: number;
 let highestSongId: number;
 
-describe("Song Controller Tests", () => {
+describe("Song Endpoints Tests", () => {
   beforeEach(async () => {
     let albumCreationResponse: any;
     let songCreationResponse: any;
@@ -109,6 +109,49 @@ describe("Song Controller Tests", () => {
         `/song?album=nonexistent album&band=nonexistent band}`
       );
       expect(response.statusCode).toEqual(404);
+    });
+  });
+
+  describe("POST album/", () => {
+    test("Should create a new song if all fields are correct", async () => {
+      const newSong = { name: "new song", albumId: Number(highestAlbumId) };
+      const response = await supertest(app).post("/song").send(newSong);
+
+      expect(response.statusCode).toEqual(201);
+      expect(response.body).toEqual({ ...response.body, ...newSong });
+    });
+
+    test("Should return not found if the albumId doesn't match any existing album", async () => {
+      const newSong = { name: "new song", albumId: Number(highestAlbumId + 1) };
+      const response = await supertest(app).post("/song").send(newSong);
+
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.error).toEqual("Album not found");
+    });
+
+    test("Should fail if the request has no body", async () => {
+      const response = await supertest(app).post("/song");
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual(
+        "Invalid request, missing request body"
+      );
+    });
+
+    test("Should fail if no song name is specified", async () => {
+      const newSong = { albumId: Number(highestAlbumId) };
+      const response = await supertest(app).post("/song").send(newSong);
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("A song must have a name");
+    });
+
+    test("Should fail if no albumId is specified", async () => {
+      const newSong = { name: "new song" };
+      const response = await supertest(app).post("/song").send(newSong);
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("A song must have an album");
     });
   });
 });

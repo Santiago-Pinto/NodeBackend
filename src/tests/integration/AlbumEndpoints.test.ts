@@ -1,8 +1,8 @@
 import supertest from "supertest";
 import { describe, test, expect } from "@jest/globals";
-import app from "../../../index";
-import { Album } from "../../../api/models/album";
-import db from "../../../api/config/db";
+import app from "../../index";
+import { Album } from "../../api/models/album";
+import db from "../../api/config/db";
 
 const testAlbums = [
   { name: "Album 1", year: 1987, band: "Band A" },
@@ -19,7 +19,7 @@ const testAlbums = [
 
 let highestAlbumId: number;
 
-describe("Album Controller Tests", () => {
+describe("Album Endpoints Tests", () => {
   beforeEach(async () => {
     let response: any;
     for (const album of testAlbums) {
