@@ -112,7 +112,7 @@ describe("Song Endpoints Tests", () => {
     });
   });
 
-  describe("POST album/", () => {
+  describe("POST song/", () => {
     test("Should create a new song if all fields are correct", async () => {
       const newSong = { name: "new song", albumId: Number(highestAlbumId) };
       const response = await supertest(app).post("/song").send(newSong);
