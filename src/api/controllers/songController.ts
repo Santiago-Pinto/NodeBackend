@@ -46,12 +46,6 @@ export class SongController {
       const result = await this.songService.createSong(songName, albumId);
       return response.status(statusCodes.CREATED).json(result);
     } catch (error: any) {
-      if (error instanceof BadRequestException) {
-        return response
-          .status(statusCodes.BAD_REQUEST)
-          .json({ error: error.message });
-      }
-
       if (error instanceof NotFoundException) {
         return response
           .status(statusCodes.NOT_FOUND)
@@ -62,13 +56,52 @@ export class SongController {
         .json({ error: error.message });
     }
   };
+
+  updateSong = async (request: Request, response: Response) => {
+    const bodyMissing = checkRequestBody(request);
+
+    if (bodyMissing) {
+      return response
+        .status(statusCodes.BAD_REQUEST)
+        .json({ error: bodyMissing });
+    }
+
+    try {
+      const result = await this.songService.updateSong(
+        request.body,
+        parseInt(request.params.id)
+      );
+      return response.status(statusCodes.SUCCESS).json(result);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        return response
+          .status(statusCodes.NOT_FOUND)
+          .json({ error: error.message });
+      }
+
+      return response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  };
 }
 
-const validateSongData = (request: Request) => {
-  const songData = request.body;
-  if (!Object.keys(songData).length) {
+const checkRequestBody = (request: Request) => {
+  if (!Object.keys(request.body).length) {
     return "Invalid request, missing request body";
   }
+};
+
+const validateSongData = (request: Request) => {
+  const missingRequestBodyMessage = checkRequestBody(request);
+
+  if (missingRequestBodyMessage) {
+    return missingRequestBodyMessage;
+  }
+
+  const songData = request.body;
+
   if (!songData.name) {
     return "A song must have a name";
   }

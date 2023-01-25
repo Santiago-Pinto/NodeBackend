@@ -47,4 +47,22 @@ export class SongService {
 
     return Song.create({ name, albumId });
   };
+
+  updateSong = async (params: Omit<Song, "id">, id: number): Promise<Song> => {
+    const song = await Song.findByPk(id);
+
+    if (!song) {
+      throw new NotFoundException("Song not found");
+    }
+
+    if (params.albumId) {
+      const songAlbum = await Album.findByPk(params.albumId);
+
+      if (!songAlbum) {
+        throw new NotFoundException("Album not found");
+      }
+    }
+
+    return await song.update({ id: id, ...params });
+  };
 }

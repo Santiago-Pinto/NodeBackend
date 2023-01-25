@@ -54,7 +54,7 @@ describe("Song Endpoints Tests", () => {
         });
       }
     }
-    highestSongId = songCreationResponse.albumId;
+    highestSongId = songCreationResponse.id;
   });
 
   afterEach(async () => {
@@ -152,6 +152,77 @@ describe("Song Endpoints Tests", () => {
 
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual("A song must have an album");
+    });
+  });
+
+  describe("PUT song/{id}", () => {
+    test("Should update a song if all fields are correct", async () => {
+      const newSongData = {
+        name: "new song name",
+        albumId: Number(highestAlbumId),
+      };
+      const response = await supertest(app)
+        .put(`/song/${highestSongId}`)
+        .send(newSongData);
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({ ...response.body, ...newSongData });
+    });
+
+    test("Should update a song if only a name is provided", async () => {
+      const newSongData = {
+        name: "new song name",
+      };
+      const response = await supertest(app)
+        .put(`/song/${highestSongId}`)
+        .send(newSongData);
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({ ...response.body, ...newSongData });
+    });
+
+    test("Should update a song if only an albumId is provided", async () => {
+      const newSongData = {
+        albumId: Number(highestAlbumId),
+      };
+      const response = await supertest(app)
+        .put(`/song/${highestSongId}`)
+        .send(newSongData);
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({ ...response.body, ...newSongData });
+    });
+
+    test("Should fail if the albumId provided doesn't match with any existing album", async () => {
+      const newSongData = {
+        albumId: Number(highestAlbumId + 1),
+      };
+      const response = await supertest(app)
+        .put(`/song/${highestSongId}`)
+        .send(newSongData);
+
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.error).toEqual("Album not found");
+    });
+
+    test("Should fail if the song id provided doesn't match with any existing song", async () => {
+      const newSongData = {
+        name: "new song name",
+        albumId: Number(highestAlbumId),
+      };
+      const response = await supertest(app)
+        .put(`/song/${highestSongId + 1}`)
+        .send(newSongData);
+
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.error).toEqual("Song not found");
+    });
+
+    test("Should fail if the request has no body", async () => {
+      const response = await supertest(app).put(`/song/${highestSongId}`);
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.error).toEqual("Invalid request, missing request body");
     });
   });
 });
