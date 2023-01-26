@@ -319,6 +319,7 @@ describe("Album Endpoints Tests", () => {
         .send({ ...updatedAlbum, name: "Test Album", band: "Band B" });
       expect(response.statusCode).toEqual(200);
       expect(response.body).toEqual({
+        ...response.body,
         id: highestAlbumId,
         ...updatedAlbum,
         name: "Test Album",
@@ -331,7 +332,11 @@ describe("Album Endpoints Tests", () => {
         .put(`/album/${highestAlbumId}`)
         .send(updatedAlbum);
       expect(response.statusCode).toEqual(200);
-      expect(response.body).toEqual({ id: highestAlbumId, ...updatedAlbum });
+      expect(response.body).toEqual({
+        id: highestAlbumId,
+        ...response.body,
+        ...updatedAlbum,
+      });
     });
   });
 

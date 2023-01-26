@@ -43,5 +43,6 @@ Album.hasMany(Song, {
   foreignKey: "albumId",
   onDelete: "CASCADE",
   constraints: false,
+  as: "songs",
 });
 Song.belongsTo(Album, { foreignKey: "albumId", as: "album" });
