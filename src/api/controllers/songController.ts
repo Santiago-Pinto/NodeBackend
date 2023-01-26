@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { BadRequestException } from "../models/exceptions/BadRequestException";
 import { NotFoundException } from "../models/exceptions/NotFoundException";
 import { SongFilter } from "../models/filters/songFilter";
 import { SongService } from "../services/songService";
@@ -73,6 +72,23 @@ export class SongController {
       );
       return response.status(statusCodes.SUCCESS).json(result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        return response
+          .status(statusCodes.NOT_FOUND)
+          .json({ error: error.message });
+      }
+
+      return response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  };
+
+  deleteSong = async (request: Request, response: Response) => {
+    try {
+      await this.songService.deleteSong(parseInt(request.params.id));
+      return response.status(statusCodes.SUCCESS).json();
     } catch (error: any) {
       if (error instanceof NotFoundException) {
         return response

@@ -65,4 +65,14 @@ export class SongService {
 
     return await song.update({ id: id, ...params });
   };
+
+  deleteSong = async (id: number) => {
+    const song = await Song.findByPk(id);
+
+    if (!song) {
+      throw new NotFoundException("Song not found");
+    }
+
+    await song.destroy();
+  };
 }

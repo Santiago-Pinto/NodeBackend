@@ -8,8 +8,9 @@ const songController = new SongController();
 router.get("/", songController.getSongs);
 router.post("/", songController.createSong);
 router.put("/:id", songController.updateSong);
+router.delete("/:id", songController.deleteSong);
 
 /*router.get("/:id", songController.getAlbumById);
-router.delete("/:id", songController.deleteAlbum);*/
+ */
 
 export { router as SongRouter };

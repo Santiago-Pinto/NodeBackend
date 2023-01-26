@@ -222,7 +222,28 @@ describe("Song Endpoints Tests", () => {
       const response = await supertest(app).put(`/song/${highestSongId}`);
 
       expect(response.statusCode).toEqual(400);
-      expect(response.body.error).toEqual("Invalid request, missing request body");
+      expect(response.body.error).toEqual(
+        "Invalid request, missing request body"
+      );
+    });
+  });
+
+  describe("DELETE song/{id}", () => {
+    test("Song should be deleted if a valid id is passed", async () => {
+      const response = await supertest(app).delete(`/song/${highestSongId}`);
+
+      const songs = await Song.findAll();
+      expect(response.statusCode).toEqual(200);
+      expect(songs.length).toEqual(testSongs.length - 1);
+    });
+
+    test("Should throw error if the id is not valid", async () => {
+      const response = await supertest(app).delete(
+        `/song/${highestSongId + 1}`
+      );
+
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.error).toEqual("Song not found");
     });
   });
 });
