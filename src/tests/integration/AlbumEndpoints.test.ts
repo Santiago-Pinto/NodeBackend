@@ -3,6 +3,7 @@ import { describe, test, expect } from "@jest/globals";
 import app from "../../index";
 import { Album } from "../../api/models/album";
 import db from "../../api/config/db";
+import { Song } from "../../api/models/song";
 
 const testAlbums = [
   { name: "Album 1", year: 1987, band: "Band A" },
@@ -17,26 +18,27 @@ const testAlbums = [
   { name: "Album 10", year: 2008, band: "Band C" },
 ];
 
-let highestAlbumId: number;
-
 describe("Album Endpoints Tests", () => {
-  beforeEach(async () => {
-    let response: any;
-    for (const album of testAlbums) {
-      response = await Album.create(album);
-    }
-    highestAlbumId = response.id;
-  });
-
-  afterEach(async () => {
-    await Album.destroy({ truncate: true });
-  });
-
   afterAll(async () => {
+    await Album.destroy({ truncate: true });
+    await Song.destroy({ truncate: true });
     await db.connection.close();
   });
 
   describe("GET album/", () => {
+    let highestAlbumId: number;
+    beforeAll(async () => {
+      let response: any;
+      for (const album of testAlbums) {
+        response = await Album.create(album);
+      }
+      highestAlbumId = response.id;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+    });
+
     test("Should return all albums when filters are not set", async () => {
       const response = await supertest(app).get("/album");
       expect(response.body).toHaveLength(testAlbums.length);
@@ -140,9 +142,22 @@ describe("Album Endpoints Tests", () => {
   });
 
   describe("GET album/{id}", () => {
+    let highestAlbumId: number;
+    beforeAll(async () => {
+      let response: any;
+      for (const album of testAlbums) {
+        response = await Album.create(album);
+      }
+      highestAlbumId = response.id;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+    });
+
     test("Should return status code of 404 if no album is found", async () => {
       //Since highestAlbumId grants no other album was created after, i just simply increase it by one to force a nonexisting id
-      const response = await supertest(app).get(`/album/${++highestAlbumId}`);
+      const response = await supertest(app).get(`/album/${highestAlbumId + 1}`);
       expect(response.body.error).toBe("Album not found");
       expect(response.statusCode).toEqual(404);
     });
@@ -163,6 +178,19 @@ describe("Album Endpoints Tests", () => {
   });
 
   describe("POST album/", () => {
+    let highestAlbumId: number;
+    beforeAll(async () => {
+      let response: any;
+      for (const album of testAlbums) {
+        response = await Album.create(album);
+      }
+      highestAlbumId = response.id;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+    });
+
     test("Should return error if the request has no body", async () => {
       const response = await supertest(app).post(`/album`);
       expect(response.statusCode).toEqual(400);
@@ -245,6 +273,19 @@ describe("Album Endpoints Tests", () => {
   });
 
   describe("PUT album/{id}", () => {
+    let highestAlbumId: number;
+    beforeAll(async () => {
+      let response: any;
+      for (const album of testAlbums) {
+        response = await Album.create(album);
+      }
+      highestAlbumId = response.id;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+    });
+
     const updatedAlbum = {
       name: "New Album name",
       year: 1990,
@@ -341,6 +382,18 @@ describe("Album Endpoints Tests", () => {
   });
 
   describe("DELETE album/{id}", () => {
+    let highestAlbumId: number;
+    beforeAll(async () => {
+      let response: any;
+      for (const album of testAlbums) {
+        response = await Album.create(album);
+      }
+      highestAlbumId = response.id;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+    });
     test("Should return error if there is no album for the given id", async () => {
       const response = await supertest(app).delete(
         `/album/${highestAlbumId + 1}`
@@ -350,11 +403,25 @@ describe("Album Endpoints Tests", () => {
     });
 
     test("Should return status code of 200 if succeeded", async () => {
+      for (let i = 0; i < 2; ++i) {
+        await Song.create({ albumId: highestAlbumId, name: "testSong" });
+      }
+
+      await Song.create({ albumId: highestAlbumId - 1, name: "testSong" }); // This one won't get deleted
+
       const response = await supertest(app).delete(`/album/${highestAlbumId}`);
       expect(response.statusCode).toEqual(200);
 
       const allAlbums = await Album.findAll();
       expect(allAlbums.length).toEqual(testAlbums.length - 1);
+
+      const allSongs = await Song.findAll();
+      expect(allSongs.length).toEqual(1);
+
+      const songsFromDeletedAlbum = await Song.findAll({
+        where: { albumId: highestAlbumId },
+      });
+      expect(songsFromDeletedAlbum.length).toEqual(0); // Testing delete on cascade
     });
   });
 });

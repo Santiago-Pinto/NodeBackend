@@ -28,45 +28,55 @@ const testSongs = [
   },
 ];
 
-let highestAlbumId: number;
-let highestSongId: number;
+const setupTest = async (): Promise<{
+  highestAlbumId: number;
+  highestSongId: number;
+}> => {
+  let albumCreationResponse: any;
+  let songCreationResponse: any;
+  for (const album of testAlbums) {
+    albumCreationResponse = await Album.create(album);
+  }
+  const highestAlbumId = albumCreationResponse.id;
+
+  for (let i = 0; i < testSongs.length; ++i) {
+    if (i < 2) {
+      await Song.create({
+        ...testSongs[i],
+        albumId: highestAlbumId,
+      });
+    } else {
+      songCreationResponse = await Song.create({
+        ...testSongs[i],
+        albumId: highestAlbumId - 1,
+      });
+    }
+  }
+  const highestSongId = songCreationResponse.id;
+  return { highestAlbumId, highestSongId };
+};
 
 describe("Song Endpoints Tests", () => {
-  beforeEach(async () => {
-    let albumCreationResponse: any;
-    let songCreationResponse: any;
-
-    for (const album of testAlbums) {
-      albumCreationResponse = await Album.create(album);
-    }
-    highestAlbumId = albumCreationResponse.id;
-
-    for (let i = 0; i < testSongs.length; ++i) {
-      if (i < 2) {
-        await Song.create({
-          ...testSongs[i],
-          albumId: highestAlbumId,
-        });
-      } else {
-        songCreationResponse = await Song.create({
-          ...testSongs[i],
-          albumId: highestAlbumId - 1,
-        });
-      }
-    }
-    highestSongId = songCreationResponse.id;
-  });
-
-  afterEach(async () => {
+  afterAll(async () => {
     await Album.destroy({ truncate: true });
     await Song.destroy({ truncate: true });
-  });
-
-  afterAll(async () => {
     await db.connection.close();
   });
 
   describe("GET song/", () => {
+    let highestAlbumId: number;
+    let highestSongId: number;
+    beforeAll(async () => {
+      const setupResult = await setupTest();
+      highestAlbumId = setupResult.highestAlbumId;
+      highestSongId = setupResult.highestSongId;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+      await Song.destroy({ truncate: true });
+    });
+
     test("Should return all songs when filters are not set", async () => {
       const response = await supertest(app).get("/song");
       expect(response.body).toHaveLength(testSongs.length);
@@ -113,6 +123,19 @@ describe("Song Endpoints Tests", () => {
   });
 
   describe("POST song/", () => {
+    let highestAlbumId: number;
+    let highestSongId: number;
+    beforeAll(async () => {
+      const setupResult = await setupTest();
+      highestAlbumId = setupResult.highestAlbumId;
+      highestSongId = setupResult.highestSongId;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+      await Song.destroy({ truncate: true });
+    });
+
     test("Should create a new song if all fields are correct", async () => {
       const newSong = { name: "new song", albumId: Number(highestAlbumId) };
       const response = await supertest(app).post("/song").send(newSong);
@@ -156,6 +179,19 @@ describe("Song Endpoints Tests", () => {
   });
 
   describe("PUT song/{id}", () => {
+    let highestAlbumId: number;
+    let highestSongId: number;
+    beforeAll(async () => {
+      const setupResult = await setupTest();
+      highestAlbumId = setupResult.highestAlbumId;
+      highestSongId = setupResult.highestSongId;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+      await Song.destroy({ truncate: true });
+    });
+
     test("Should update a song if all fields are correct", async () => {
       const newSongData = {
         name: "new song name",
@@ -171,7 +207,7 @@ describe("Song Endpoints Tests", () => {
 
     test("Should update a song if only a name is provided", async () => {
       const newSongData = {
-        name: "new song name",
+        name: "brand new song name",
       };
       const response = await supertest(app)
         .put(`/song/${highestSongId}`)
@@ -229,6 +265,19 @@ describe("Song Endpoints Tests", () => {
   });
 
   describe("DELETE song/{id}", () => {
+    let highestAlbumId: number;
+    let highestSongId: number;
+    beforeAll(async () => {
+      const setupResult = await setupTest();
+      highestAlbumId = setupResult.highestAlbumId;
+      highestSongId = setupResult.highestSongId;
+    });
+
+    afterAll(async () => {
+      await Album.destroy({ truncate: true });
+      await Song.destroy({ truncate: true });
+    });
+
     test("Song should be deleted if a valid id is passed", async () => {
       const response = await supertest(app).delete(`/song/${highestSongId}`);
 
