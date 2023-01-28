@@ -37,9 +37,9 @@ export class SongService {
   createSong = async (name: string, albumId: number): Promise<Song> => {
     const queryFilter: DynamicObject = {};
 
-    queryFilter.albumId = { [Op.eq]: albumId };
+    queryFilter.id = { [Op.eq]: albumId };
 
-    const songAlbum = await Song.findOne({ where: queryFilter });
+    const songAlbum = await Album.findOne({ where: queryFilter });
 
     if (!songAlbum) {
       throw new NotFoundException("Album not found");
