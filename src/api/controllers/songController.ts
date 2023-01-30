@@ -11,7 +11,7 @@ export class SongController {
     this.songService = new SongService();
   }
 
-  // If query params are provided, the following fuction will filter albums, otherwise it will return all
+  
   getSongs = async (request: Request, response: Response) => {
     const band = request.query.band as string;
     const album = request.query.album as string;

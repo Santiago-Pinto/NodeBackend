@@ -10,7 +10,4 @@ router.post("/", songController.createSong);
 router.put("/:id", songController.updateSong);
 router.delete("/:id", songController.deleteSong);
 
-/*router.get("/:id", songController.getAlbumById);
- */
-
 export { router as SongRouter };
