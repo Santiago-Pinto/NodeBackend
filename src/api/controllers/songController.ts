@@ -3,6 +3,7 @@ import { NotFoundException } from "../models/exceptions/NotFoundException";
 import { SongFilter } from "../models/filters/songFilter";
 import { SongService } from "../services/songService";
 import { statusCodes } from "../utils/statusCodes";
+import { validateRequestBody } from "../utils/requestValidation";
 
 export class SongController {
   songService: SongService;
@@ -11,7 +12,6 @@ export class SongController {
     this.songService = new SongService();
   }
 
-  
   getSongs = async (request: Request, response: Response) => {
     const band = request.query.band as string;
     const album = request.query.album as string;
@@ -57,12 +57,12 @@ export class SongController {
   };
 
   updateSong = async (request: Request, response: Response) => {
-    const bodyMissing = checkRequestBody(request);
+    const invalidBodyMessage = validateRequestBody(request);
 
-    if (bodyMissing) {
+    if (invalidBodyMessage) {
       return response
         .status(statusCodes.BAD_REQUEST)
-        .json({ error: bodyMissing });
+        .json({ error: invalidBodyMessage });
     }
 
     try {
@@ -103,14 +103,8 @@ export class SongController {
   };
 }
 
-const checkRequestBody = (request: Request) => {
-  if (!Object.keys(request.body).length) {
-    return "Invalid request, missing request body";
-  }
-};
-
 const validateSongData = (request: Request) => {
-  const missingRequestBodyMessage = checkRequestBody(request);
+  const missingRequestBodyMessage = validateRequestBody(request);
 
   if (missingRequestBodyMessage) {
     return missingRequestBodyMessage;

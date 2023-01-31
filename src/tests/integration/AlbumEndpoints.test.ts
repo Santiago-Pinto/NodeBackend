@@ -18,6 +18,14 @@ const testAlbums = [
   { name: "Album 10", year: 2008, band: "Band C" },
 ];
 
+const setupTest = async () => {
+  let response: any;
+  for (const album of testAlbums) {
+    response = await Album.create(album);
+  }
+  return response;
+};
+
 describe("Album Endpoints Tests", () => {
   afterAll(async () => {
     await Album.destroy({ truncate: true });
@@ -28,10 +36,7 @@ describe("Album Endpoints Tests", () => {
   describe("GET album/", () => {
     let highestAlbumId: number;
     beforeAll(async () => {
-      let response: any;
-      for (const album of testAlbums) {
-        response = await Album.create(album);
-      }
+      const response = await setupTest();
       highestAlbumId = response.id;
     });
 
@@ -144,10 +149,7 @@ describe("Album Endpoints Tests", () => {
   describe("GET album/{id}", () => {
     let highestAlbumId: number;
     beforeAll(async () => {
-      let response: any;
-      for (const album of testAlbums) {
-        response = await Album.create(album);
-      }
+      const response = await setupTest();
       highestAlbumId = response.id;
     });
 
@@ -180,10 +182,7 @@ describe("Album Endpoints Tests", () => {
   describe("POST album/", () => {
     let highestAlbumId: number;
     beforeAll(async () => {
-      let response: any;
-      for (const album of testAlbums) {
-        response = await Album.create(album);
-      }
+      const response = await setupTest();
       highestAlbumId = response.id;
     });
 
@@ -275,10 +274,7 @@ describe("Album Endpoints Tests", () => {
   describe("PUT album/{id}", () => {
     let highestAlbumId: number;
     beforeAll(async () => {
-      let response: any;
-      for (const album of testAlbums) {
-        response = await Album.create(album);
-      }
+      const response = await setupTest();
       highestAlbumId = response.id;
     });
 
@@ -306,7 +302,7 @@ describe("Album Endpoints Tests", () => {
       expect(response.body.error).toBe("Album not found");
     });
 
-    test("Should return error if the album has no name", async () => {
+    test("Should allow to only update the name", async () => {
       const albumWithNoName = {
         year: 1987,
         band: "Band A",
@@ -384,10 +380,7 @@ describe("Album Endpoints Tests", () => {
   describe("DELETE album/{id}", () => {
     let highestAlbumId: number;
     beforeAll(async () => {
-      let response: any;
-      for (const album of testAlbums) {
-        response = await Album.create(album);
-      }
+      const response = await setupTest();
       highestAlbumId = response.id;
     });
 

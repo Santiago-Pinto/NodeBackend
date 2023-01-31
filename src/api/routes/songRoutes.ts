@@ -7,7 +7,7 @@ const songController = new SongController();
 // Here go the routes that the router will handle
 router.get("/", songController.getSongs);
 router.post("/", songController.createSong);
-router.put("/:id", songController.updateSong);
+router.patch("/:id", songController.updateSong);
 router.delete("/:id", songController.deleteSong);
 
 export { router as SongRouter };

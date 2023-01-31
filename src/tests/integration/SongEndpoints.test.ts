@@ -178,7 +178,7 @@ describe("Song Endpoints Tests", () => {
     });
   });
 
-  describe("PUT song/{id}", () => {
+  describe("PATCG song/{id}", () => {
     let highestAlbumId: number;
     let highestSongId: number;
     beforeAll(async () => {
@@ -198,7 +198,7 @@ describe("Song Endpoints Tests", () => {
         albumId: Number(highestAlbumId),
       };
       const response = await supertest(app)
-        .put(`/song/${highestSongId}`)
+        .patch(`/song/${highestSongId}`)
         .send(newSongData);
 
       expect(response.statusCode).toEqual(200);
@@ -210,7 +210,7 @@ describe("Song Endpoints Tests", () => {
         name: "brand new song name",
       };
       const response = await supertest(app)
-        .put(`/song/${highestSongId}`)
+        .patch(`/song/${highestSongId}`)
         .send(newSongData);
 
       expect(response.statusCode).toEqual(200);
@@ -222,7 +222,7 @@ describe("Song Endpoints Tests", () => {
         albumId: Number(highestAlbumId),
       };
       const response = await supertest(app)
-        .put(`/song/${highestSongId}`)
+        .patch(`/song/${highestSongId}`)
         .send(newSongData);
 
       expect(response.statusCode).toEqual(200);
@@ -234,7 +234,7 @@ describe("Song Endpoints Tests", () => {
         albumId: Number(highestAlbumId + 1),
       };
       const response = await supertest(app)
-        .put(`/song/${highestSongId}`)
+        .patch(`/song/${highestSongId}`)
         .send(newSongData);
 
       expect(response.statusCode).toEqual(404);
@@ -247,7 +247,7 @@ describe("Song Endpoints Tests", () => {
         albumId: Number(highestAlbumId),
       };
       const response = await supertest(app)
-        .put(`/song/${highestSongId + 1}`)
+        .patch(`/song/${highestSongId + 1}`)
         .send(newSongData);
 
       expect(response.statusCode).toEqual(404);
@@ -255,7 +255,7 @@ describe("Song Endpoints Tests", () => {
     });
 
     test("Should fail if the request has no body", async () => {
-      const response = await supertest(app).put(`/song/${highestSongId}`);
+      const response = await supertest(app).patch(`/song/${highestSongId}`);
 
       expect(response.statusCode).toEqual(400);
       expect(response.body.error).toEqual(
