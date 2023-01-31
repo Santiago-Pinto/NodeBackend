@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Albums", {
+    await queryInterface.createTable("Songs", {
       id: {
         type: Sequelize.DataTypes.INTEGER,
         autoIncrement: true,
@@ -13,18 +13,23 @@ module.exports = {
         type: Sequelize.DataTypes.STRING,
         allowNull: false,
       },
-      year: {
+      albumId: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
-      },
-      band: {
-        type: Sequelize.DataTypes.STRING,
-        allowNull: false,
+        /** Is this required? **/
+        references: {
+          key: "id",
+          model: {
+            tableName: "Albums",
+          },
+          as: "albumId",
+        },
+        /***********************/
       },
     });
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("Albums");
+    await queryInterface.dropTable("Songs");
   },
 };

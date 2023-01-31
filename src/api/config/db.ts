@@ -20,7 +20,7 @@ const connection = new Sequelize(config.DB_URI, {
 
 const db: DynamicObject = {};
 
-const modelsFileExtensions = ["ts", "tsx", "js"];
+const modelsFileExtensions = ["ts", "tsx"];
 
 const modelsDirectory = path.normalize(`${__dirname}/../models`); // Returns the path to reach the folder with the models base on the location of this file
 
@@ -35,11 +35,14 @@ fs.readdirSync(modelsDirectory)
     db[Object.keys(model)[0]] = Object.values(model)[0];
   });
 
+
+/** Is this required? **/
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
+/***********************/
 
 db.connection = connection;
 

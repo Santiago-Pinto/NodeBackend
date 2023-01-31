@@ -1,5 +1,6 @@
 import express, { Application, json } from "express";
 import { AlbumRouter } from "../src/api/routes/albumRoutes";
+import { SongRouter } from "../src/api/routes/songRoutes";
 import db from "./api/config/db";
 
 const app: Application = express();
@@ -7,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 // Here go the routers
 app.use(json());
 app.use("/album", AlbumRouter); //This one already handles all calls with the /album prefix
+app.use("/song", SongRouter);
 //
 
 //DB connection

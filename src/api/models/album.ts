@@ -1,4 +1,5 @@
 import { DataTypes, Model } from "sequelize";
+import { Song } from "./song";
 import db from "../config/db";
 
 export class Album extends Model {
@@ -36,3 +37,13 @@ Album.init(
     timestamps: false,
   }
 );
+
+// Not sure if it's a bug in Sequelize, but for some reason the foreign key has to be indicated in both sides of the association
+Album.hasMany(Song, {
+  foreignKey: "albumId",
+  onDelete: "cascade",
+  hooks: true,
+  constraints: false,
+  as: "songs",
+});
+Song.belongsTo(Album, { foreignKey: "albumId", as: "album" });

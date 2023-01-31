@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import { DynamicObject } from "../utils/types";
 import { NotFoundException } from "../models/exceptions/NotFoundException";
 import { BadRequestException } from "../models/exceptions/BadRequestException";
+import { Song } from "../models/song";
 
 export class AlbumService {
   getAlbums = async (filter: AlbumFilter): Promise<Album[]> => {
@@ -35,12 +36,23 @@ export class AlbumService {
     }
     const albums = await Album.findAll({
       where: queryFilter,
+      include: {
+        model: Song,
+        as: "songs",
+        attributes: ["id", "name"], // These are the fields that we want to keep from the right side table of the join (In this case Song)
+      },
     });
     return albums;
   };
 
   getAlbumById = async (id: number): Promise<Album | null> => {
-    const album = await Album.findByPk(id);
+    const album = await Album.findByPk(id, {
+      include: {
+        model: Song,
+        as: "songs",
+        attributes: ["id", "name"],
+      },
+    });
 
     if (album) {
       return album;
